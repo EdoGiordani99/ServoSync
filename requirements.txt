@@ -1,0 +1,7 @@
+customtkinter==5.2.1
+pyFirmata==1.1.0
+pygame==2.5.2
+scikit-image==0.18.1
+scikit-learn==1.0
+scipy @ file:///opt/concourse/worker/volumes/live/7d10d993-3825-404e-6e5d-9947c19e8c6d/volume/scipy_1618855951189/work
+tk==0.1.0

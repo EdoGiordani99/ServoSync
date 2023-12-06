@@ -1,9 +1,9 @@
+import time
 import pygame
 import threading
-import time
-import os 
 
 from datetime import datetime
+
 
 class AudioPlayer:
     
@@ -57,22 +57,39 @@ class AudioPlayer:
         self.is_playing = False
         self.stopped = True
 
-    def get_length(self):
-        return self.track.get_length() if self.track else None
+    def get_length_seconds(self):
+        return round(self.track.get_length(), 0) if self.track else None
 
+    def get_length_seconds(self):
+        return round(self.track.get_length(), 0) if self.track else None
+    
+    def get_lenght_timestamp(self):
+        return self.seconds_to_timestamp(self.get_length_seconds())
+    
     def get_time_int(self):
         if self.time:
             return self.time.total_seconds()
         else: 
             return 0
 
+    def get_timestamp(self):
+        return self.seconds_to_timestamp(self.time)
+    
+    def seconds_to_timestamp(self, seconds):
+        hours, remainder = divmod(int(round(seconds, 0)), 3600)
+        minutes, seconds = divmod(remainder, 60)
+        timestamp = "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
+        return timestamp
+
+    def set_volume(self, volume:float):
+        if self.track:
+            self.track.set_volume(volume)
+
 
 if __name__ == "__main__":
     a = AudioPlayer()
 
     a.load_file("mp3/Anna - Gasolina (Extended).mp3")
-    a.play()
-    time.sleep(2)
-    a.pause()
-    time.sleep(2)
+
+    a.track.set_volume(0.10)
     a.play()
