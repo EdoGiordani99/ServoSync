@@ -405,6 +405,15 @@ class GUI:
         self.popup = CTkToplevel(self.root)
         self.popup.title("Save")
 
+        width, height = 500, 100  # Set the height of the popup window
+
+        # Calculate the x and y coordinates to center the popup
+        x = (self.root.winfo_screenwidth() - width) // 2
+        y = (self.root.winfo_screenheight() - height) // 2
+
+        # Set the geometry of the popup window
+        self.popup.geometry(f'{width}x{height}+{x}+{y}')
+        
         # Add widgets to the popup frame
         label = CTkLabel(self.popup, text="Do you want to save the changes before closing?")
         label.grid(row=0, column=0, columnspan=3, padx=10, pady=10)

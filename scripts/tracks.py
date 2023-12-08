@@ -244,7 +244,7 @@ class FaderTrack:
     
     def active_btn_callback(self):
         if self.active:
-            self.active_btn.configure(fg_color="black")
+            self.active_btn.configure(fg_color="gray")
             self.active = False
         else:
             self.active_btn.configure(fg_color="green")
