@@ -1,5 +1,5 @@
+from customtkinter import *
 from PIL import Image, ImageTk
-
 
 class Icons:
     def __init__(self) -> None:
@@ -11,9 +11,23 @@ class Icons:
         self.music_icon = self.get_icon(path="img/music_icon.png", height=20, width=20)
         self.connected_icon = self.get_icon(path="img/connected_icon.png", height=20, width=20)
         self.disconnected_icon = self.get_icon(path="img/disconnected_icon.png", height=20, width=20)
+        self.app_icon = self.get_icon(path="img/ServoSyncIcon.png")
 
     def get_icon(self, path, height:int=60, width:int=60):
+        """  
         icon_image = Image.open(path)
         resized_icon = icon_image.resize((height, width))
         return ImageTk.PhotoImage(resized_icon)
+        """
+
+        if type(path) == str:
+            light_path, dark_path = path, path
+        elif type(path) == tuple:
+            light_path, dark_path = path
+
+
+        return CTkImage(light_image=Image.open(light_path),
+                            dark_image=Image.open(dark_path),
+                            size=(height, width))
+
 

@@ -26,6 +26,11 @@ class GUI:
         self.menubar = Menu(self.root)
         self.root.config(menu=self.menubar)
         self.root.protocol("WM_DELETE_WINDOW", self.popup_exit)
+        
+        self.root.title("Servo Sync!")
+        
+
+        self.root.iconbitmap("ServoSync.ico")
 
         self.controller = Controller()
         
@@ -99,8 +104,6 @@ class GUI:
         self.RC = 0
         self.editor = None
 
-        self.load_project("projects/untitled_2.pkl")
-
         self.root.mainloop()
 
     def menubar_init(self):
@@ -141,9 +144,8 @@ class GUI:
         self.menubar.entryconfig("Aspect", menu=self.aspect_menu.entryconfig(0, label=new_text))
 
     def reconnect_controller(self):
-
         self.controller.connect_to_arduino()
-        if self.controller.connected: 
+        if self.controller.connected:
             for servo in self.tracks.values():
                 servo.update_available_servos(self.controller.get_servos_names())
         
