@@ -13,7 +13,7 @@ from scripts.utils import Icons
 from scripts.editor import Editor
 from scripts.controller import Controller
 from scripts.audioPlayer import AudioPlayer
-from scripts.tracks import FaderTrack, ButtonTrack
+from scripts.tracks import FaderTrack, ButtonTrack, PanTiltTrack, CoupleTrack
 
 
 class GUI:
@@ -35,6 +35,7 @@ class GUI:
         self.controller = Controller()
         
         self.row, self.column, self.song_path = row, column, None
+        self.occupied_pos = []
         self.COLUMNS = 4
 
         self.frame = CTkFrame(self.root, fg_color=self.root.cget("fg_color"))
@@ -104,6 +105,8 @@ class GUI:
         self.RC = 0
         self.editor = None
 
+        self.load_project("projects/EdoProva.pkl")
+
         self.root.mainloop()
 
     def menubar_init(self):
@@ -117,6 +120,8 @@ class GUI:
         self.track_menu = Menu(self.menubar)
         self.track_menu.add_command(label='Add Fader Track', command=lambda: self.add_track(type="fader"))
         self.track_menu.add_command(label='Add Button Track', command=lambda: self.add_track(type="button"))
+        self.track_menu.add_command(label='Add Pan-Tilt Track', command=lambda: self.add_track(type="pantilt"))
+        self.track_menu.add_command(label='Add Couple Track', command=lambda: self.add_track(type="couple"))
         self.menubar.add_cascade(label="Track", menu=self.track_menu)
 
         self.controller_menu = Menu(self.menubar)
@@ -216,16 +221,47 @@ class GUI:
     def not_loaded_error(self):
         messagebox.showerror("No Music to Play", "Please, select an audio file you want to play")
 
+    def get_free_coords(self, typ):
+
+        if typ == "pantilt":
+            rowspan, colspan= 2, 2
+        else: 
+            rowspan, colspan= 1, 1
+
+        for i in range(3, 100):
+            for j in range(self.COLUMNS):
+                check, to_add = self.check_free_pos(i, j, rowspan, colspan)
+                if check:
+                    self.occupied_pos.extend(to_add)
+                    return i, j
+        return None, None
+
+    def check_free_pos(self, i, j, rowspan, colspan):
+        to_add = []
+        for si in range(rowspan):
+            for sj in range(colspan):
+                pos = (i+si, j+sj)
+                if pos in self.occupied_pos or pos[1] > self.COLUMNS-1:
+                    return False, None
+                to_add.append(pos)
+        return True, to_add
+
     def add_track(self, type: str):
-        row = (self.num_tracks // self.COLUMNS) + 3 
-        column = (self.num_tracks % self.COLUMNS)
+
+        row, column = self.get_free_coords(type)
         self.num_tracks += 1
 
         if type == "fader":
             track = FaderTrack(self.root, row, column, self.num_tracks, self.controller, self.open_editor_callback)
         elif type == "button":
             track = ButtonTrack(self.root, row, column, self.num_tracks, self.controller, self.open_editor_callback)
+        elif type == "pantilt":
+            track = PanTiltTrack(self.root, row, column, self.num_tracks, self.controller, self.open_editor_callback)
+        elif type == "couple":
+            track = CoupleTrack(self.root, row, column, self.num_tracks, self.controller, self.open_editor_callback)
+
         self.tracks[track.uuid] = track
+        print(self.occupied_pos)
 
     def save_tracks(self):
         self.tracks_status = {}
@@ -263,8 +299,9 @@ class GUI:
                      "tape": self.record_tape, 
                      "frame_rate": self.frame_rate,
                      "save_path": self.save_path,
+                     "occupied_pos": self.occupied_pos,
                      }
-
+        
         with open(self.save_path, 'wb') as file:
             pickle.dump(save_dict, file)
 
@@ -318,14 +355,13 @@ class GUI:
             else:
                 self.rec = True
                 self.play_pause_callback()
-                self.rec_btn.config(image=self.icons.rec_stop_icon)
+                self.rec_btn.configure(image=self.icons.rec_stop_icon)
 
     def get_rec_tracks_status(self):
         rec_tracks = {}
         for track in self.tracks.values():
             if track.record:
                 rec_tracks[track.uuid] = track.get_value()
-        
         return rec_tracks
 
     def recorder_thread_callback(self):
@@ -366,6 +402,7 @@ class GUI:
         self.record_tape = project_dict["tape"]
         self.frame_rate = project_dict["frame_rate"]
         self.save_path = project_dict["save_path"]
+        self.occupied_pos = project_dict["occupied_pos"]
 
         # Tracks
         self.num_tracks = len(project_dict["tracks"])
@@ -377,17 +414,21 @@ class GUI:
                 self.tracks[uuid] = ButtonTrack(self.root, track["row"], track["column"], 0, self.controller, self.open_editor_callback)
             elif typ == "FADER":
                 self.tracks[uuid] = FaderTrack(self.root, track["row"], track["column"], 0, self.controller, self.open_editor_callback)
+            elif typ == "PANTILT":
+                self.tracks[uuid] = PanTiltTrack(self.root, track["row"], track["column"], 0, self.controller, self.open_editor_callback)
+            elif typ == "COUPLE":
+                self.tracks[uuid] = CoupleTrack(self.root, track["row"], track["column"], 0, self.controller, self.open_editor_callback)
 
             self.tracks[uuid].load_track(track_dict=track)
         
-    def open_editor_callback(self, track_uuid):
+    def open_editor_callback(self, track_uuid, index:int=None):
         self.editor = Editor(self.root, self.row+3, 
                              column=self.column, 
                              columnspan=self.COLUMNS, 
                              track_name=self.tracks[track_uuid].get_name(),
                              update_callback = self.update_edit_track)
         
-        self.editor.load_editor(self.record_tape, track_uuid)
+        self.editor.load_editor(self.record_tape, track_uuid, index)
     
     def is_editor_open(self):
         if not self.editor:
@@ -400,8 +441,19 @@ class GUI:
         uuid = self.editor.track_uuid
         new_tape = self.editor.tape
 
-        for i in range(len(self.record_tape)):
-            self.record_tape[i][uuid] = new_tape[i][1]
+        idx = self.editor.index
+        if idx is not None:
+            for i in range(len(self.record_tape)):
+
+                if uuid in self.record_tape[i]:
+                    self.record_tape[i][uuid][idx] = new_tape[i][1]
+                else:
+                    a = [0, 0]
+                    a[idx] = new_tape[i][1]
+                    self.record_tape[i][uuid] = a
+        else:
+            for i in range(len(self.record_tape)):
+                self.record_tape[i][uuid] = new_tape[i][1]
     
     def popup_exit(self):
         self.popup = CTkToplevel(self.root)
@@ -432,7 +484,7 @@ class GUI:
     def exit_callback(self, value):
 
         if value == "Y":
-            if self.save_path:
+            if "untitled" not in self.save_path:
                 self.save()
             else:
                 self.save_as()

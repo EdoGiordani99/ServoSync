@@ -227,6 +227,7 @@ class Editor:
     def __init__(self, root, row, column, columnspan, track_name, update_callback) -> None:
         self.root, self.row, self.column = root, row, column
 
+        self.index = None
         self.tape = []
         self.track_uuid = None
         self.original_length = 1
@@ -358,16 +359,21 @@ class Editor:
         self.editor_frame.destroy()
         self.is_open = False
 
-    def load_editor(self, record_tape:dict, track_uuid:str):
+    def load_editor(self, record_tape:dict, track_uuid:str, index:int=None):
 
         self.tape = []
         self.track_uuid = track_uuid
         self.original_length = len(record_tape)
+        self.index = index
         for i, d in enumerate(record_tape):
             try:
-                y = d[track_uuid]
-            except: 
-                y = 0
+                if index is not None:
+                    y = d[track_uuid][index]
+                else:
+                    y = d[track_uuid]
+            except:
+                    y = 0
+            
             self.tape.append(KeyFrame(real_x=i, 
                                       real_y=y,
                                       original_length=len(record_tape)))
