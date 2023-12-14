@@ -3,7 +3,6 @@ import time
 import pickle
 import threading
 import tkinter as tk
-import customtkinter
 
 from customtkinter import *
 from tkinter import ttk, filedialog, messagebox, Menu
@@ -27,9 +26,8 @@ class GUI:
         self.root.config(menu=self.menubar)
         self.root.protocol("WM_DELETE_WINDOW", self.popup_exit)
         
-        self.root.title("Servo Sync!")
+        self.root.title("Servo Sync")
         
-
         self.root.iconbitmap("ServoSync.ico")
 
         self.controller = Controller()
@@ -105,7 +103,7 @@ class GUI:
         self.RC = 0
         self.editor = None
 
-        self.load_project("projects/EdoProva.pkl")
+        self.load_project("projects/EdoTest.pkl")
 
         self.root.mainloop()
 
@@ -394,6 +392,10 @@ class GUI:
 
         with open(project_path, 'rb') as file:
             project_dict = pickle.load(file)
+
+        # Name of window
+        file_name = os.path.basename(project_path)
+        self.root.title(f"Servo Sync - {file_name}")
 
         # Loading Song
         self.load_audio_file(project_dict["song_file_path"])

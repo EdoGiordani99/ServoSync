@@ -167,12 +167,12 @@ class ButtonTrack:
         self.active = not track_dict["active"]
         self.active_btn_callback()
 
-        self.selected_servo_name = track_dict["selected_servo_name"]
         self.track_name.set(track_dict["track_name"])
 
+        self.selected_servo_name = track_dict["selected_servo_name"]
         self.selected_servo_pin = track_dict["selected_servo_pin"]
         if self.selected_servo_pin:
-            self.servo_selector.set(f"Servo {self.selected_servo_pin}")
+            self.servo_selector.set(self.selected_servo_name)
 
 
 class FaderTrack:
@@ -298,12 +298,12 @@ class FaderTrack:
         self.active = not track_dict["active"]
         self.active_btn_callback()
 
-        self.selected_servo_name = track_dict["selected_servo_name"]
         self.track_name.set(track_dict["track_name"])
 
+        self.selected_servo_name = track_dict["selected_servo_name"]
         self.selected_servo_pin = track_dict["selected_servo_pin"]
         if self.selected_servo_pin:
-            self.servo_selector.set(f"Servo {self.selected_servo_pin}")
+            self.servo_selector.set(self.selected_servo_name)
 
 
 class PanTiltTrack:
@@ -339,7 +339,7 @@ class PanTiltTrack:
         self.pan_servo_label.grid(row = self.row+2, column=self.column, padx=5, pady=10)
         self.pan_servo_selector = ttk.Combobox(self.frame, values=self.available_servos, width=7)
         self.pan_servo_selector.grid(row = self.row+2, column=self.column+1, padx=5, pady=10)
-        self.pan_servo_selector.bind("<<ComboboxSelected>>", lambda: self.select_servo("PAN"))
+        self.pan_servo_selector.bind("<<ComboboxSelected>>", lambda x: self.select_servo("PAN"))
         self.selected_pan_servo_pin = None
         self.selected_pan_servo_name = None
 
@@ -352,7 +352,7 @@ class PanTiltTrack:
         self.tilt_servo_label.grid(row = self.row+3, column=self.column, padx=5, pady=10)
         self.tilt_servo_selector = ttk.Combobox(self.frame, values=self.available_servos, width=7)
         self.tilt_servo_selector.grid(row = self.row+3, column=self.column+1, padx=5, pady=10)
-        self.tilt_servo_selector.bind("<<ComboboxSelected>>", lambda: self.select_servo("TILT"))
+        self.tilt_servo_selector.bind("<<ComboboxSelected>>", lambda x: self.select_servo("TILT"))
         self.selected_tilt_servo_pin = None
         self.selected_tilt_servo_name = None
 
@@ -431,13 +431,15 @@ class PanTiltTrack:
         self.active = not track_dict["active"]
         self.active_btn_callback()
 
+        self.selected_pan_servo_name = track_dict["selected_pan_servo_name"]
         self.selected_pan_servo_pin = track_dict["selected_pan_servo_pin"]
         if self.selected_pan_servo_pin:
-            self.pan_servo_selector.set(f"Servo {self.selected_pan_servo_pin}")
+            self.pan_servo_selector.set(self.selected_pan_servo_name)
         
+        self.selected_tilt_servo_name = track_dict["selected_tilt_servo_name"]
         self.selected_tilt_servo_pin = track_dict["selected_tilt_servo_pin"]
         if self.selected_tilt_servo_pin:
-            self.tilt_servo_selector.set(f"Servo {self.selected_tilt_servo_pin}")
+            self.tilt_servo_selector.set(self.selected_tilt_servo_name)
 
 
 class Joystick:
@@ -577,7 +579,7 @@ class CoupleTrack:
         self.servo1_label.grid(row = self.row+2, column=self.column, padx=5, pady=10)
         self.servo1_selector = ttk.Combobox(self.frame, values=self.available_servos, width=7)
         self.servo1_selector.grid(row = self.row+2, column=self.column+1, columnspan=2, padx=5, pady=10)
-        self.servo1_selector.bind("<<ComboboxSelected>>", lambda: self.select_servo(1))
+        self.servo1_selector.bind("<<ComboboxSelected>>", lambda x: self.select_servo(1))
         self.selected_servo1_pin = None
         self.selected_servo1_name = None
 
@@ -589,7 +591,7 @@ class CoupleTrack:
         self.servo2_label.grid(row = self.row+3, column=self.column, padx=5, pady=10)
         self.servo2_selector = ttk.Combobox(self.frame, values=self.available_servos, width=7)
         self.servo2_selector.grid(row = self.row+3, column=self.column+1, columnspan=2, padx=5, pady=10)
-        self.servo2_selector.bind("<<ComboboxSelected>>", lambda: self.select_servo(2))
+        self.servo2_selector.bind("<<ComboboxSelected>>", lambda x: self.select_servo(2))
         self.selected_servo2_pin = None
         self.selected_servo2_name = None
 
@@ -724,13 +726,18 @@ class CoupleTrack:
         self.selected_servo2_name = track_dict["selected_servo2_name"]
         self.track_name.set(track_dict["track_name"])
 
+        self.selected_servo1_name = track_dict["selected_servo1_name"]
         self.selected_servo1_pin = track_dict["selected_servo1_pin"]
         if self.selected_servo1_pin:
-            self.servo1_selector.set(f"Servo {self.selected_servo1_pin}")
+            self.servo1_selector.set(self.selected_servo1_name)
 
+        self.selected_servo2_name = track_dict["selected_servo2_name"]
         self.selected_servo2_pin = track_dict["selected_servo2_pin"]
         if self.selected_servo2_pin:
-            self.servo2_selector.set(f"Servo {self.selected_servo2_pin}")
+            self.servo2_selector.set(self.selected_servo2_name)
+
+        print(self.selected_servo1_name)
+        print(self.selected_servo2_name)
 
 
 class ServoAngle:
