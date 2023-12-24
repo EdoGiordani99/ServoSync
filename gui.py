@@ -103,8 +103,6 @@ class GUI:
         self.RC = 0
         self.editor = None
 
-        self.load_project("projects/EdoTest.pkl")
-
         self.root.mainloop()
 
     def menubar_init(self):
@@ -112,7 +110,8 @@ class GUI:
         self.file_menu.add_command(label='Save', command=self.save)
         self.file_menu.add_command(label='Save As', command=self.save_as)
         self.file_menu.add_command(label='Open', command=self.open)
-
+        self.file_menu.add_command(label='Open Preset from File', command=self.load_preset_from_file)
+        
         self.menubar.add_cascade(label="File", menu=self.file_menu)
 
         self.track_menu = Menu(self.menubar)
@@ -245,10 +244,15 @@ class GUI:
         return True, to_add
 
     def add_track(self, type: str):
+        """
+        Args:
+            type (str): fader, button, pantilt, couple
+        """
 
         row, column = self.get_free_coords(type)
         self.num_tracks += 1
 
+        print(row, column)
         if type == "fader":
             track = FaderTrack(self.root, row, column, self.num_tracks, self.controller, self.open_editor_callback)
         elif type == "button":
@@ -496,5 +500,26 @@ class GUI:
         if value == "N" or value == "Y":
             self.root.destroy()
 
+    def load_preset_from_file(self, project_path):
+
+        with open(project_path, 'rb') as file:
+            project_dict = pickle.load(file)
+
+        # Tracks
+        self.num_tracks = len(project_dict["tracks"])
+        for i, track in project_dict["tracks"].items():
+            uuid = track["uuid"]
+            typ = track["type"]
+
+            if typ == "BUTTON":
+                self.tracks[uuid] = ButtonTrack(self.root, track["row"], track["column"], 0, self.controller, self.open_editor_callback)
+            elif typ == "FADER":
+                self.tracks[uuid] = FaderTrack(self.root, track["row"], track["column"], 0, self.controller, self.open_editor_callback)
+            elif typ == "PANTILT":
+                self.tracks[uuid] = PanTiltTrack(self.root, track["row"], track["column"], 0, self.controller, self.open_editor_callback)
+            elif typ == "COUPLE":
+                self.tracks[uuid] = CoupleTrack(self.root, track["row"], track["column"], 0, self.controller, self.open_editor_callback)
+
+            self.tracks[uuid].load_track(track_dict=track)
 
 gui = GUI()
