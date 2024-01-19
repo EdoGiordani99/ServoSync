@@ -1,11 +1,17 @@
+import json
 import pickle
 
-with open("projects/EdoTest.pkl", 'rb') as file:
+import os
+
+with open("projects/SantaClauseIsComingToTown.pkl", 'rb') as file:
     project_dict = pickle.load(file)
 
-for k, v in project_dict["tracks"].items():
-    
-    for kk, vv in v.items():
-        print(kk, vv)
+for a in project_dict["tape"]:
+    for uuid, value in a.items():
+        print(uuid, value)
 
-    print("\n")
+
+        
+
+
+

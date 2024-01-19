@@ -1,4 +1,7 @@
 import time
+import requests
+import threading
+import os
 
 from pyfirmata import Arduino
 
@@ -49,6 +52,61 @@ class Controller:
 
     def move(self, servo_pin, angle):
         self.servos[servo_pin].set_angle(angle)
+
+    def get_servos_names(self):
+        return [s.name for s in self.servos if s is not None]
+    
+class WiFiServo:
+    def __init__(self, pin) -> None:
+        self.pin = pin
+        self.name = f"Servo_{pin}"
+
+class WiFiController:
+    def __init__(self, max_retry_number:int=3) -> None:
+        
+        self.max_retry_number = max_retry_number
+        self.servos = []
+
+        self.ESP32_IP = "192.168.1.202"
+
+        self.servos_init()
+        self.connected = self.check_connection()
+    
+    def servos_init (self):
+        for i in range(16):
+            self.servos.append(WiFiServo(i))
+
+    def connect_to_arduino(self):
+        pass
+
+
+    def check_connection(self, max_retry_number:int=3, max_seconds:int=5):
+
+        for i in range(max_retry_number):
+            print(f"Trial {i+1} ...")
+            try: 
+                url = f"http://{self.ESP32_IP}/connectionCheck"
+                response = requests.get(url, timeout=max_seconds)
+                print("Connected")
+                return True
+            except requests.exceptions.RequestException as e:
+                print("Failed")
+        return False
+
+    def move_servo(self, servo_pin, angle):
+        
+        try: 
+            url = f"http://{self.ESP32_IP}/setAngle?servo_num={servo_pin}&angle={angle}"
+            response = requests.get(url, timeout=1)
+            os.system("clear")
+            print("GOOD CONNECTION")
+
+        except requests.exceptions.RequestException as e:
+            os.system("clear")
+            print("BAD CONNECTION")
+    
+    def move(self, servo_pin, angle):
+        threading.Thread(target=self.move_servo, args=(servo_pin, angle)).start()
 
     def get_servos_names(self):
         return [s.name for s in self.servos if s is not None]

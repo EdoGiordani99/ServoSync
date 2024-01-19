@@ -2,15 +2,15 @@ from customtkinter import *
 from PIL import Image, ImageTk
 
 class Icons:
-    def __init__(self) -> None:
-        self.play_icon = self.get_icon(path="img/play_icon.png")
-        self.pause_icon = self.get_icon(path="img/pause_icon.png")
-        self.stop_icon = self.get_icon(path="img/stop_icon.png")
-        self.rec_start_icon = self.get_icon(path="img/rec_start.png")
-        self.rec_stop_icon = self.get_icon(path="img/rec_stop.png")
-        self.music_icon = self.get_icon(path="img/music_icon.png", height=20, width=20)
-        self.connected_icon = self.get_icon(path="img/connected_icon.png", height=20, width=20)
-        self.disconnected_icon = self.get_icon(path="img/disconnected_icon.png", height=20, width=20)
+    def __init__(self, size:int = 60) -> None:
+        self.play_icon = self.get_icon(path="img/play_icon.png", height=size, width=size)
+        self.pause_icon = self.get_icon(path="img/pause_icon.png", height=size, width=size)
+        self.stop_icon = self.get_icon(path="img/stop_icon.png", height=size, width=size)
+        self.rec_start_icon = self.get_icon(path="img/rec_start.png", height=size, width=size)
+        self.rec_stop_icon = self.get_icon(path="img/rec_stop.png", height=size, width=size)
+        self.music_icon = self.get_icon(path="img/music_icon.png", height=size/3, width=size/3)
+        self.connected_icon = self.get_icon(path="img/connected_icon.png", height=size/3, width=size/3)
+        self.disconnected_icon = self.get_icon(path="img/disconnected_icon.png", height=size/3, width=size/3)
         self.app_icon = self.get_icon(path="img/ServoSyncIcon.png")
 
     def get_icon(self, path, height:int=60, width:int=60):
