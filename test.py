@@ -1,17 +1,11 @@
-import json
-import pickle
+import tkinter as tk
+from tkinter import font
+from scripts.utils import *
 
-import os
+root = tk.Tk()
+root.title("Bold Text on Hover")
 
-with open("projects/SantaClauseIsComingToTown.pkl", 'rb') as file:
-    project_dict = pickle.load(file)
+b = FancyButton(root, "CIAO", font=("Proxima Nova", 16))
+b.grid(row=0, column=0)
 
-for a in project_dict["tape"]:
-    for uuid, value in a.items():
-        print(uuid, value)
-
-
-        
-
-
-
+root.mainloop()

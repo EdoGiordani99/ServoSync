@@ -17,7 +17,7 @@ from scripts.tracks import FaderTrack, ButtonTrack, PanTiltTrack, CoupleTrack
 
 class ProjectApp:
 
-    def __init__(self, row:int = 0, column:int = 0):
+    def __init__(self, row:int = 0, column:int = 0, path:str = None):
 
         self.root = CTk()
         self.appearance = "dark"
@@ -103,6 +103,10 @@ class ProjectApp:
         self.frame_rate = 0.1
         self.RC = 0
         self.editor = None
+
+        if path:
+            self.load_project(path)
+
 
         self.root.mainloop()
 
