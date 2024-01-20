@@ -1,53 +1,25 @@
-import tkinter as tk
+import os
+from scripts.utils import *
 
-def change_menu():
-    # Clear the existing menu
-    for item in menu.winfo_children():
-        item.destroy()
+def get_file_paths(folder_path):
+    file_paths = []
+    
+    # Get all files in the folder
+    for root, dirs, files in os.walk(folder_path):
+        for file in files:
+            file_paths.append(os.path.join(root, file))
+    
+    return file_paths
 
-    # Create new menu items
-    file_menu = tk.Menu(menu, tearoff=0)
-    file_menu.add_command(label="New", command=lambda: print("New"))
-    file_menu.add_command(label="Open", command=lambda: print("Open"))
-    file_menu.add_separator()
-    file_menu.add_command(label="Exit", command=root.destroy)
+# Replace 'your_folder_path' with the path to the folder you want to scan
+folder_path = 'projects'
+a = []
+if os.path.exists(folder_path):
+    files_list = get_file_paths(folder_path)
+    print("File Paths:")
+    for file_path in files_list:
+        a.append(file_path)
+else:
+    print(f"The folder '{folder_path}' does not exist.")
 
-    edit_menu = tk.Menu(menu, tearoff=0)
-    edit_menu.add_command(label="Cut", command=lambda: print("Cut"))
-    edit_menu.add_command(label="Copy", command=lambda: print("Copy"))
-    edit_menu.add_command(label="Paste", command=lambda: print("Paste"))
-
-    # Add the new menu items
-    menu.add_cascade(label="File", menu=file_menu)
-    menu.add_cascade(label="Edit", menu=edit_menu)
-
-# Create the main window
-root = tk.Tk()
-root.title("Dynamic Menu Example")
-
-# Create the initial menu
-menu = tk.Menu(root)
-root.config(menu=menu)
-
-# Create initial menu items
-file_menu = tk.Menu(menu, tearoff=0)
-file_menu.add_command(label="New", command=lambda: print("New"))
-file_menu.add_command(label="Open", command=lambda: print("Open"))
-file_menu.add_separator()
-file_menu.add_command(label="Exit", command=root.destroy)
-
-edit_menu = tk.Menu(menu, tearoff=0)
-edit_menu.add_command(label="Cut", command=lambda: print("Cut"))
-edit_menu.add_command(label="Copy", command=lambda: print("Copy"))
-edit_menu.add_command(label="Paste", command=lambda: print("Paste"))
-
-# Add initial menu items to the menu
-menu.add_cascade(label="File", menu=file_menu)
-menu.add_cascade(label="Edit", menu=edit_menu)
-
-# Create a button to trigger menu change
-change_menu_button = tk.Button(root, text="Change Menu", command=change_menu)
-change_menu_button.pack(pady=10)
-
-# Start the main loop
-root.mainloop()
+write_on_pickle(a, "cache/recent_projects.pkl")

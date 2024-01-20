@@ -42,9 +42,12 @@ MAIN_ICON = CTkImage(light_image=Image.open("img/ServoSyncIconTransparent.png"),
 
 def load_from_pickle(input_file):
     with open(input_file, 'rb') as file:
-        loaded_list = pickle.load(file)
-    return loaded_list
+        loaded_obj = pickle.load(file)
+    return loaded_obj
 
+def write_on_pickle(obj, file_path):
+    with open(file_path, 'wb') as file:
+        pickle.dump(obj, file)
 
 
 class RecentFileButton:

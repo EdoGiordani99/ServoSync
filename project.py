@@ -250,7 +250,6 @@ class ProjectApp:
         row, column = self.get_free_coords(type)
         self.num_tracks += 1
 
-
         if type == "fader":
             track = FaderTrack(self.root, row, column, self.num_tracks, self.controller, self.open_editor_callback)
         elif type == "button":
@@ -391,8 +390,15 @@ class ProjectApp:
 
     def load_project(self, project_path):
 
-        with open(project_path, 'rb') as file:
-            project_dict = pickle.load(file)
+        # Updating the recent files opened
+        rec_file_path = "cache/recent_projects.pkl"
+        recent_files = load_from_pickle(rec_file_path)
+        recent_files = [item for item in recent_files if item != project_path]
+        recent_files.insert(0, project_path)
+        write_on_pickle(obj=recent_files, file_path=rec_file_path)
+
+        # Loading from memory
+        project_dict = load_from_pickle(project_path)
 
         # Name of window
         file_name = os.path.basename(project_path)
@@ -504,6 +510,8 @@ class ProjectApp:
             self.stop_callback()
             self.exit_check = True
             self.root.destroy()
+            for item in self.menubar.winfo_children():
+                item.destroy()
         
 
     def load_preset_from_file(self, project_path):
