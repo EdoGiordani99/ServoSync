@@ -10,10 +10,6 @@ from tkinter import ttk, filedialog, messagebox, Menu, font
 
 from scripts.colors import *
 from scripts.utils import *
-from scripts.editor import Editor
-from scripts.controller import Controller
-from scripts.audioPlayer import AudioPlayer
-from scripts.tracks import FaderTrack, ButtonTrack, PanTiltTrack, CoupleTrack
 from project import ProjectApp
 
 from gui import HomePage
@@ -29,7 +25,6 @@ class GUI:
         self.home_page = HomePage(self.root, open_project_callback=self.open_project)
 
         self.project_is_open = False
-
         self.root.mainloop()
 
     def start(self):
@@ -39,7 +34,6 @@ class GUI:
         self.menubar = Menu(self.root)
         self.root.config(menu=self.menubar)
         self.root.protocol("WM_DELETE_WINDOW", self.exit)
-        self.center()
         
         self.root.title("Servo Sync")
         
@@ -48,7 +42,7 @@ class GUI:
     def open_project(self, file):
         self.project_is_open = True
         self.home_page.destroy()
-        self.project_page = ProjectApp(main_root=self.root, path=file, appearance=self.appearance)
+        self.project_page = ProjectApp(main_root=self.root, path=file, appearance=self.appearance, menubar=self.menubar)
         
     def exit(self):
         if self.project_is_open:
@@ -58,10 +52,5 @@ class GUI:
                 self.home_page = HomePage(self.root, open_project_callback=self.open_project)
         else:
             self.root.destroy()
-            
-
-    def center(self):
-        self.root.columnconfigure(1, weight=1)
-        self.root.columnconfigure(2, weight=1)
 
 gui = GUI()

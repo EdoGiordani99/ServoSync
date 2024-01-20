@@ -17,7 +17,7 @@ from scripts.tracks import FaderTrack, ButtonTrack, PanTiltTrack, CoupleTrack
 
 class ProjectApp:
 
-    def __init__(self, main_root, appearance, row:int = 0, column:int = 0, path:str = None):
+    def __init__(self, main_root, appearance, menubar, row:int = 0, column:int = 0, path:str = None):
 
         self.main_root = main_root
 
@@ -28,7 +28,7 @@ class ProjectApp:
         self.controller = Controller()
         # self.controller = WiFiController()
 
-        self.menubar = Menu(self.main_root)
+        self.menubar = menubar
         self.row, self.column, self.song_path = row, column, None
         self.occupied_pos = []
         self.COLUMNS = 4
@@ -261,7 +261,6 @@ class ProjectApp:
             track = CoupleTrack(self.root, row, column, self.num_tracks, self.controller, self.open_editor_callback)
 
         self.tracks[track.uuid] = track
-        print(self.occupied_pos)
 
     def save_tracks(self):
         self.tracks_status = {}

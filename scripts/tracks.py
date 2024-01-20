@@ -230,7 +230,6 @@ class FaderTrack:
         self.last_click_time = current_time
 
         if 0 < time_diff < 500:
-            print("Double-tap detected!")
             self.move(self.rest_angle)
             self.fader_label.configure(text=str(self.rest_angle))
             self.fader.set(self.rest_angle) 
@@ -619,7 +618,6 @@ class CoupleTrack:
         self.last_click_time = current_time
 
         if 0 < time_diff < 500:
-            print("Double-tap detected!")
             self.move([self.rest_angle]*2)
             self.s1.draw_angle(self.rest_angle)
             self.s2.draw_angle(self.rest_angle)
@@ -735,10 +733,6 @@ class CoupleTrack:
         self.selected_servo2_pin = track_dict["selected_servo2_pin"]
         if self.selected_servo2_pin:
             self.servo2_selector.set(self.selected_servo2_name)
-
-        print(self.selected_servo1_name)
-        print(self.selected_servo2_name)
-
 
 class ServoAngle:
 

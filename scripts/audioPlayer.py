@@ -40,9 +40,6 @@ class AudioPlayer:
                 self.startTimestamp = datetime.now()
                 self.timer_thread.start()
 
-        else:
-            print("ERROR: No track loaded on the Audio Player!")
-
     def pause(self):
         self.paused_at += self.mixer.music.get_pos()/1000
         self.mixer.music.pause()

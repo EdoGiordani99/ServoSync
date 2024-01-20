@@ -26,8 +26,9 @@ class HomePage:
 
         self.open_project_callback = open_project_callback
 
-        self.root = CTkFrame(root, border_color=BUTTON_COLOR, fg_color=BG_DARK_COLOR, border_width=2)
-        self.root.grid(row = 0, column=0)
+        self.root = CTkFrame(root, border_color=BG_DARK_COLOR, fg_color=BG_DARK_COLOR, border_width=2)
+        # self.root.grid(row = 0, column=2)
+        self.root.pack()
 
         self.icons = Icons(size=150)
 
