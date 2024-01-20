@@ -8,7 +8,7 @@ from customtkinter import *
 from tkinter import ttk, filedialog, messagebox, Menu
 
 from scripts.colors import *
-from scripts.utils import Icons
+from scripts.utils import *
 from scripts.editor import Editor
 from scripts.controller import Controller, WiFiController
 from scripts.audioPlayer import AudioPlayer
@@ -17,27 +17,23 @@ from scripts.tracks import FaderTrack, ButtonTrack, PanTiltTrack, CoupleTrack
 
 class ProjectApp:
 
-    def __init__(self, row:int = 0, column:int = 0, path:str = None):
+    def __init__(self, main_root, appearance, row:int = 0, column:int = 0, path:str = None):
 
-        self.root = CTk()
-        self.appearance = "dark"
-        set_appearance_mode(self.appearance)
-        self.menubar = Menu(self.root)
-        self.root.config(menu=self.menubar)
-        self.root.protocol("WM_DELETE_WINDOW", self.popup_exit)
-        
-        self.root.title("Servo Sync")
-        
-        self.root.iconbitmap("ServoSync.ico")
+        self.main_root = main_root
+
+        self.root = CTkFrame(main_root, fg_color=BG_DARK_COLOR)
+        self.root.grid(row=row, column=column)
+        self.appearance = appearance
 
         self.controller = Controller()
         # self.controller = WiFiController()
-        
+
+        self.menubar = Menu(self.main_root)
         self.row, self.column, self.song_path = row, column, None
         self.occupied_pos = []
         self.COLUMNS = 4
 
-        self.frame = CTkFrame(self.root, fg_color=self.root.cget("fg_color"))
+        self.frame = CTkFrame(self.root, fg_color=BG_DARK_COLOR)
         self.frame.grid(row = self.row, column=self.column, columnspan=self.COLUMNS)
 
         self.player = AudioPlayer()
@@ -106,9 +102,6 @@ class ProjectApp:
 
         if path:
             self.load_project(path)
-
-
-        self.root.mainloop()
 
     def menubar_init(self):
         self.file_menu = Menu(self.menubar)
@@ -257,7 +250,7 @@ class ProjectApp:
         row, column = self.get_free_coords(type)
         self.num_tracks += 1
 
-        print(row, column)
+
         if type == "fader":
             track = FaderTrack(self.root, row, column, self.num_tracks, self.controller, self.open_editor_callback)
         elif type == "button":
@@ -404,7 +397,7 @@ class ProjectApp:
 
         # Name of window
         file_name = os.path.basename(project_path)
-        self.root.title(f"Servo Sync - {file_name}")
+        self.main_root.title(f"Servo Sync - {file_name}")
 
         # Loading Song
         self.load_audio_file(project_dict["song_file_path"])
@@ -469,6 +462,7 @@ class ProjectApp:
     def popup_exit(self):
         self.popup = CTkToplevel(self.root)
         self.popup.title("Save")
+        self.exit_check = False
 
         width, height = 500, 100  # Set the height of the popup window
 
@@ -477,8 +471,8 @@ class ProjectApp:
         y = (self.root.winfo_screenheight() - height) // 2
 
         # Set the geometry of the popup window
-        self.popup.geometry(f'{width}x{height}+{x}+{y}')
-        
+        # self.popup.geometry(f'{width}x{height}+{x}+{y}')
+
         # Add widgets to the popup frame
         label = CTkLabel(self.popup, text="Do you want to save the changes before closing?")
         label.grid(row=0, column=0, columnspan=3, padx=10, pady=10)
@@ -492,9 +486,14 @@ class ProjectApp:
         cancel_btn = CTkButton(self.popup, text="Cancel", fg_color=BUTTON_COLOR, hover_color=BUTTON_HOVER_COLOR, command=lambda: self.exit_callback("C"))
         cancel_btn.grid(row=1, column=0, padx=10, pady=10)
 
-    def exit_callback(self, value):
+        self.root.wait_window(self.popup)
 
+        return True if self.exit_check else False
+
+
+    def exit_callback(self, value):
         if value == "Y":
+            self.stop_callback()
             if "untitled" not in self.save_path:
                 self.save()
             else:
@@ -503,7 +502,10 @@ class ProjectApp:
         self.popup.destroy()
 
         if value == "N" or value == "Y":
+            self.stop_callback()
+            self.exit_check = True
             self.root.destroy()
+        
 
     def load_preset_from_file(self, project_path):
 
